@@ -5,20 +5,5 @@
     "1.20.1-recommended": "1.0.0",
     "1.21-latest": "2.0.0",
     "1.21-recommended": "2.0.0"
-  },
-  "mcversions": ["1.20.1", "1.21"],
-  "versions": {
-    "1.0.0": {
-      "recommended": true,
-      "description": "Back ported to Fabric 1.20.1, and more ores coming soon!!!"
-    },
-    "1.0.1": {
-      "latest": true,
-      "description": "Back ported to Fabric 1.20.1, and more ores coming soon!!!"
-    },
-    "2.0.0":{
-      "latest": true,
-      "description": "Made Verson For Fabric 1.21.8 and Up. Plus remade from scratch."
-    }
   }
 }
