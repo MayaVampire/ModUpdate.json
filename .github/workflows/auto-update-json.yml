@@ -1,0 +1,48 @@
+name: Auto-update update.json
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up jq
+        run: sudo apt-get install -y jq
+
+      - name: Get version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Get artifact URL
+        # Replace this with actual URL or generated Modrinth link
+        run: echo "DOWNLOAD_URL=https://modrinth.com/mod/ore-genesis/versions" >> $GITHUB_ENV
+
+      - name: Update update.json
+        run: |
+          TEMPLATE=$(jq -r '.next_template.changelog' update.json)
+          CHANGELOG="${TEMPLATE//\{\{version\}\}/${VERSION}}"
+          
+          # Add new version entry
+          jq --arg v "$VERSION" \
+             --arg url "$DOWNLOAD_URL" \
+             --arg log "$CHANGELOG" \
+             '.versions[$v] = {changelog: $log, downloadUrl: $url}' update.json \
+             > update.tmp.json
+          
+          # Update promos for latest version (assume same Minecraft version, adjust as needed)
+          jq --arg v "$VERSION" '.promos["1.21-latest"]=$v' update.tmp.json > update.json
+          
+          rm update.tmp.json
+
+      - name: Commit and push update.json
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add update.json
+          git commit -m "Auto-update update.json for $VERSION"
+          git push origin main
